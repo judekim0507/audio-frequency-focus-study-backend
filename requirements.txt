@@ -1,0 +1,7 @@
+muselsl
+pylsl
+numpy
+scipy
+matplotlib
+fastapi
+uvicorn
