@@ -35,16 +35,19 @@ def bandpower(data, fs, band):
     return bp
 
 def normalize_focus(engagement_index, min_value, max_value):
-    # Calculate focus level percentage
     if max_value == min_value:
-        focus_level = 50.0  # Neutral focus level
+        focus_level = 50.0
     else:
+        # If engagement is above max, scale the range
+        if engagement_index > max_value:
+            max_value = engagement_index
+        
         focus_level = (engagement_index - min_value) / (max_value - min_value)
         focus_level = np.clip(focus_level, 0, 1)
-        focus_level = focus_level * 100  # Convert to percentage
+        focus_level = focus_level * 100
     return focus_level
 
-def collect_relaxed_baseline(inlet, duration=60):
+def collect_relaxed_baseline(inlet, duration=120):
     """Collect baseline EEG data during relaxed state (eyes closed)"""
     engagement_indices = []
     
@@ -68,7 +71,7 @@ def collect_relaxed_baseline(inlet, duration=60):
     return relaxed_baseline, focused_baseline
 
 def get_average_baseline():
-    # If no personalized baseline is set, use these defaults
-    min_engagement = 0.3  # Relaxed baseline
-    max_engagement = min_engagement * 2.5  # Focused baseline = 2.5x relaxed
+    # Increase the range to handle higher engagement indices
+    min_engagement = 0.3
+    max_engagement = min_engagement * 4.0  # Increase multiplier from 2.5 to 4.0
     return min_engagement, max_engagement

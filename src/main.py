@@ -168,19 +168,20 @@ async def websocket_endpoint(websocket: WebSocket):
             message = await websocket.receive_json()
             
             if message.get('type') == 'start_calibration':
-                # Collect baseline
-                relaxed, focused = collect_relaxed_baseline(inlet)
-                
-                # Update the min/max values
+                print("Starting baseline calibration...")
+                # Use the calibration function
                 global min_value, max_value
-                min_value = relaxed
-                max_value = focused
+                min_value, max_value = collect_relaxed_baseline(inlet)
                 
-                # Send calibration complete message
+                print(f"Calibration complete:")
+                print(f"Relaxed baseline (min): {min_value:.4f}")
+                print(f"Focused baseline (max): {max_value:.4f}")
+                
+                # Send calibration results back to frontend
                 await websocket.send_json({
                     "type": "calibration_complete",
-                    "min": relaxed,
-                    "max": focused
+                    "min": float(min_value),
+                    "max": float(max_value)
                 })
             
             if not is_eeg_connected:
